@@ -28,8 +28,9 @@ const loginSchema = z.object({
     }),
 });
 
-router.post('/register', validate(registerSchema), register);
-router.post('/login', validate(loginSchema), login);
+// Temporary bypass of Zod validating for debugging
+router.post('/register', (req, res, next) => { console.log('REGISTER PAYLOAD:', req.body); next(); }, register);
+router.post('/login', (req, res, next) => { console.log('LOGIN PAYLOAD:', req.body); next(); }, login);
 router.post('/refresh-token', refreshToken);
 router.post('/logout', protect, logout);
 router.get('/me', protect, getMe);
