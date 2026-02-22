@@ -1,0 +1,213 @@
+MASTER PROMPT FOR BACKEND GENERATION (Node + Express + MongoDB)
+
+Context
+You are a senior backend engineer designing a production-ready backend for an AI-Enabled Farmer–Buyer Smart Marketplace Platform.
+
+The system is a two-sided digital marketplace connecting farmers, buyers, investors, and admins, providing:
+Real-time market intelligence
+AI-assisted crop, yield, and price predictions
+Smart farmer–buyer matching
+Transparent deal execution.
+The backend must be fully functional, frontend-ready, and modular, with clear separation of concerns.
+
+TECHNOLOGY STACK (MANDATORY)
+Runtime: Node.js
+Framework: Express.js
+Database: MongoDB (Mongoose ODM)
+Auth: JWT (access + refresh tokens)
+Architecture: Layered / Service-Oriented
+API Style: REST (optionally hybrid with async jobs)
+
+CORE ARCHITECTURE RULES
+1.Follow clean layered architecture:
+routes/
+controllers/
+services/
+models/
+middlewares/
+utils/
+jobs/ (async / background)
+config/
+(Improve if necessary)
+
+No business logic inside controllers:
+Controllers only:
+Validate request
+Call service
+Return response
+
+AI/ML logic must be abstracted:
+Use placeholder / mock prediction logic
+All AI calls must go through predictionService / matchingService
+
+Use role-based authorization
+Roles: FARMER, BUYER, ADMIN, INVESTOR
+
+Every route must be:
+Implemented
+Validated
+Secured where required
+
+AUTH & USER MANAGEMENT
+Roles:
+FARMER
+BUYER
+ADMIN
+INVESTOR
+
+API BASE
+/api
+
+AUTH ROUTES (/auth)
+POST /register
+POST /login
+POST /refresh-token
+POST /logout
+GET /me
+PATCH /change-password
+Key point - The /register (POST request) route should also include role's along with email and password:
+-Farmer
+-Buyer
+-investor
+
+FARMER ROUTES (/farmers) – Role: FARMER
+GET /profile
+PUT /profile
+POST /land
+GET /land
+POST /crop
+GET /crops
+PUT /crop/:cropId
+DELETE /crop/:cropId
+GET /buyer-demands
+GET /recommended-price/:cropId
+GET /yield-estimate/:cropId
+GET /profit-estimate/:cropId
+
+BUYER ROUTES (/buyers) – Role: BUYER
+GET /profile
+PUT /profile
+POST /demand
+GET /demands
+PUT /demand/:demandId
+DELETE /demand/:demandId
+GET /farmer-listings
+POST /negotiate
+GET /quality-grades/:farmerId
+
+MARKET INTELLIGENCE (/market)
+GET /live-demand-supply
+GET /price-trends
+GET /recommended-prices
+GET /market-snapshots
+
+AI / PREDICTIONS (/predictions)
+(Mock AI logic – abstracted service)
+POST /crop
+POST /yield
+POST /price
+
+MATCHING ENGINE (/matching)
+POST /match
+GET /matches/farmer
+GET /matches/buyer
+
+DEALS & ORDERS (/deals)
+POST /create
+POST /confirm/:dealId
+POST /cancel/:dealId
+GET /my-deals
+PATCH /status/:dealId
+GET /tracking/:dealId
+
+Deal Status:
+CREATED → CONFIRMED → IN_TRANSIT → DELIVERED / CANCELLED
+
+TRANSPORT & INSURANCE (/support)
+POST /transport/quote
+POST /transport/book
+POST /insurance/quote
+POST /insurance/activate
+
+INVESTMENT FARMING (/investments) – Role: INVESTOR
+POST /project
+GET /projects
+POST /invest/:projectId
+GET /roi-prediction/:projectId
+
+REVIEWS & TRUST (/reviews)
+POST /
+GET /farmer/:farmerId
+GET /buyer/:buyerId
+GET /trust-score/:farmerId
+
+ADMIN ROUTES (/admin) – Role: ADMIN ONLY
+User Management
+GET /users
+GET /users/:userId
+PATCH /users/:userId/status
+PATCH /users/:userId/role
+
+Marketplace Oversight
+GET /deals
+GET /demands
+GET /crops
+GET /investments
+GET /reviews
+
+Analytics & Control
+GET /analytics/overview
+GET /analytics/pricing
+GET /market-health
+POST /recalculate-prices
+POST /rerun-matching
+GET /model-status
+
+Moderation
+DELETE /review/:reviewId
+DELETE /crop/:cropId
+DELETE /demand/:demandId
+
+Database Models (Required)
+User
+FarmerProfile
+BuyerProfile
+Land
+Crop
+Demand
+Deal
+Review
+Investment
+Transport
+Insurance
+MarketSnapshot
+AuditLog
+
+SECURITY REQUIREMENTS
+JWT auth middleware
+Role-based access control
+Input validation (Joi / Zod)
+Rate limiting
+Centralized error handler
+Audit logging middleware
+
+DELIVERABLES
+Complete backend source code
+.env.example
+Folder structure
+Postman-ready API (JSON responses)
+API_DOCUMENTATION.md listing:
+Routes
+Request/response formats
+Auth requirements
+
+IMPORTANT
+Do NOT skip any route
+Do NOT leave controllers empty
+Do NOT hardcode logic in routes
+Keep AI logic abstract and replaceable
+Code must run with npm install && npm run dev
+
+FINAL OUTPUT EXPECTATION
+
+A fully working backend that can be immediately connected to a frontend dashboard for farmers, buyers, admins, and investors, and extended later with real ML models without architectural changes.

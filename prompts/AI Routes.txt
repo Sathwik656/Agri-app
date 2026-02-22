@@ -1,0 +1,7 @@
+AI Routes: 
+1.According to weather and season of the year what is the best crop activity to be done, Example: Wheat harvest, Tomato growing etc...
+2.Predict the average price according to the current market conditions, Example: Wheat 21rs per..., Tomato 18rs per... etc
+3.Calculate the particular day best crop and its price of the day
+4.Predict the best selling window according to the available data
+5.Predict high demand of crop which are to be expected the time frame of the demand
+(if any of the prediction has info on particular location ex: Punjab, the data of the prediction should be based on that area itself, so the request should also include area of the user)

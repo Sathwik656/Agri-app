@@ -4,17 +4,75 @@ const Crop = require('../models/Crop');
 const FarmerProfile = require('../models/FarmerProfile');
 const Deal = require('../models/Deal');
 
+const User = require('../models/User');
+
 // Profile
 const getProfile = async (userId) => {
-    return await BuyerProfile.findOne({ user: userId });
+    let profile = await BuyerProfile.findOne({ user: userId }).populate('user', 'name email location');
+
+    if (!profile) {
+        // If no profile exists yet, return basic user info
+        const user = await User.findById(userId).select('name email location');
+        if (!user) {
+            throw new Error('User not found');
+        }
+        return {
+            name: user.name,
+            email: user.email,
+            state: user.location?.state || '',
+            city: user.location?.city || '',
+            businessName: '',
+            businessType: '',
+            phone: '',
+            avatar: '',
+            createdAt: user.createdAt
+        };
+    }
+
+    const p = profile.toObject();
+    return {
+        ...p,
+        name: p.user.name,
+        email: p.user.email,
+        state: p.address?.state || p.user.location?.state || '',
+        city: p.address?.city || p.user.location?.city || '',
+        businessName: p.companyName || '', // Map companyName to businessName
+        businessType: p.buyerType || '',    // Map buyerType to businessType
+        phone: '', // Phone not in schema yet
+        avatar: '',
+        createdAt: p.createdAt || p.user.createdAt
+    };
 };
 
 const updateProfile = async (userId, data) => {
-    return await BuyerProfile.findOneAndUpdate(
+    // Map frontend fields back to schema fields
+    const updateData = {
+        companyName: data.businessName,
+        buyerType: data.businessType,
+        address: {
+            state: data.state,
+            city: data.city
+        }
+    };
+
+    const profile = await BuyerProfile.findOneAndUpdate(
         { user: userId },
-        { ...data, user: userId },
+        { ...updateData, user: userId },
         { new: true, upsert: true }
-    );
+    ).populate('user', 'name email location');
+
+    const p = profile.toObject();
+    return {
+        ...p,
+        name: p.user.name,
+        email: p.user.email,
+        state: p.address?.state || p.user.location?.state || '',
+        city: p.address?.city || p.user.location?.city || '',
+        businessName: p.companyName || '',
+        businessType: p.buyerType || '',
+        avatar: '',
+        createdAt: p.createdAt
+    };
 };
 
 // Demands
