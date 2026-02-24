@@ -26,18 +26,61 @@ export const Login = () => {
 
         try {
             let response;
+
             if (isRegister) {
-                response = await api.post('/api/auth/register', { name, email, password, role });
+                response = await api.post('/api/auth/register', {
+                    name,
+                    email: email.trim().toLowerCase(),
+                    password,
+                    role
+                });
             } else {
-                response = await api.post('/api/auth/login', { email, password });
+                response = await api.post('/api/auth/login', {
+                    email: email.trim().toLowerCase(),
+                    password
+                });
             }
 
-            const { token, refreshToken, user } = response.data;
+            // 🔥 Correct extraction based on backend structure
+            const responseData = response.data;
 
+            if (!responseData.success) {
+                throw new Error('Authentication failed');
+            }
+
+            const {
+                id,
+                name: userName,
+                email: userEmail,
+                role: userRole,
+                token,
+                refreshToken
+            } = responseData.data;
+
+            const user = {
+                id,
+                name: userName,
+                email: userEmail,
+                role: userRole
+            };
+
+            // Store in auth store
             login(token, refreshToken, user);
-            navigate(`/${user.role.toLowerCase()}/dashboard`);
+
+            // Safe navigation
+            if (userRole) {
+                navigate(`/${userRole.toLowerCase()}/dashboard`);
+            } else {
+                throw new Error('User role missing');
+            }
+
         } catch (err) {
-            setError(err.response?.data?.message || 'Authentication failed. Please check credentials.');
+            console.error("Login Error:", err);
+            setError(
+                err.response?.data?.message ||
+                err.message ||
+                'Authentication failed. Please check credentials.'
+            );
         } finally {
             setIsLoading(false);
         }
